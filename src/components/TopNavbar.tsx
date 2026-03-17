@@ -1,7 +1,7 @@
-import { Menu, Bell, Search, User } from 'lucide-react'
+import { Menu, Bell, Search } from "lucide-react";
 
 interface TopNavbarProps {
-  onMenuClick: () => void
+  onMenuClick: () => void;
 }
 
 export default function TopNavbar({ onMenuClick }: TopNavbarProps) {
@@ -34,18 +34,7 @@ export default function TopNavbar({ onMenuClick }: TopNavbarProps) {
           <Bell className="h-5 w-5" />
           <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
         </button>
-
-        {/* User menu */}
-        <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-          <div className="hidden sm:block text-right">
-            <p className="text-sm font-medium text-text-dark">Admin User</p>
-            <p className="text-xs text-gray-500">admin@sgs.edu</p>
-          </div>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-text-light">
-            <User className="h-5 w-5" />
-          </button>
-        </div>
       </div>
     </header>
-  )
+  );
 }

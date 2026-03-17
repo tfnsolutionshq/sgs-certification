@@ -1,0 +1,37 @@
+[
+  {
+    "emailAddress": "admin@sgs.edu.ng",
+    "role": "super admin",
+    "password": "#123"
+  },
+  {
+    "emailAddress": "admin2@sgs.edu.ng",
+    "role": "super admin",
+    "password": "#456"
+  },
+  {
+    "emailAddress": "admin3@sgs.edu.ng",
+    "role": "admin",
+    "password": "#789"
+  },
+  {
+    "emailAddress": "admin4@sgs.edu.ng",
+    "role": "admin",
+    "password": "#012"
+  },
+  {
+    "emailAddress": "admin5@sgs.edu.ng",
+    "role": "admin",
+    "password": "#345"
+  },
+  {
+    "emailAddress": "admin6@sgs.edu.ng",
+    "role": "read-only admin",
+    "password": "#678"
+  },
+  {
+    "emailAddress": "admin7@sgs.edu.ng",
+    "role": "read-only admin",
+    "password": "#901"
+  }
+]
