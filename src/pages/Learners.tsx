@@ -11,6 +11,7 @@ import {
   Send,
   Edit,
 } from "lucide-react";
+import { useAuth } from "../context/auth/AuthContextProvider";
 import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
 import Card from "../components/Card";
@@ -97,10 +98,13 @@ const learners = [
 ];
 
 export default function Learners() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [cohortFilter, setCohortFilter] = useState("");
+
+  const canManage = user?.role === "super admin" || user?.role === "admin";
 
   return (
     <div>
@@ -108,22 +112,24 @@ export default function Learners() {
         title="Eligible Learners"
         description="Manage learners and their certificate eligibility"
         action={
-          <div className="flex gap-2">
-            <Link to="/bulk-upload">
+          (user?.role === "super admin" || user?.role === "admin") && (
+            <div className="flex gap-2">
+              <Link to="/bulk-upload">
+                <Button variant="secondary">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Bulk Upload
+                </Button>
+              </Link>
               <Button variant="secondary">
-                <Upload className="h-4 w-4 mr-2" />
-                Bulk Upload
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
               </Button>
-            </Link>
-            <Button variant="secondary">
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
-          </div>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </div>
+          )
         }
       />
 
@@ -244,39 +250,53 @@ export default function Learners() {
               ),
             },
             { header: "Joined", accessor: "joined" },
-            {
-              header: "Actions",
-              accessor: (row) => (
-                <div className="flex items-center gap-1">
-                  <Link to={`/learners/${row.id}`}>
-                    <button
-                      className="p-1.5 rounded hover:bg-gray-100"
-                      title="View Profile"
-                    >
-                      <Eye className="h-4 w-4 text-gray-500" />
-                    </button>
-                  </Link>
-                  <button
-                    className="p-1.5 rounded hover:bg-gray-100"
-                    title="Edit"
-                  >
-                    <Edit className="h-4 w-4 text-gray-500" />
-                  </button>
-                  {row.role === "Learner" && (
-                    <button
-                      className="p-1.5 rounded hover:bg-gray-100"
-                      title="Send Magic Link"
-                    >
-                      <Send className="h-4 w-4 text-gray-500" />
-                    </button>
-                  )}
-                  <button className="p-1.5 rounded hover:bg-gray-100">
-                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                  </button>
-                </div>
-              ),
-              className: "w-32",
-            },
+            ...(canManage
+              ? [
+                  {
+                    header: "Actions",
+                    accessor: (row: {
+                      id: number;
+                      name: string;
+                      email: string;
+                      role: string;
+                      cohort: string;
+                      program: string;
+                      status: string;
+                      joined: string;
+                      certificates: number;
+                    }) => (
+                      <div className="flex items-center gap-1">
+                        <Link to={`/learners/${row.id}`}>
+                          <button
+                            className="p-1.5 rounded hover:bg-gray-100"
+                            title="View Profile"
+                          >
+                            <Eye className="h-4 w-4 text-gray-500" />
+                          </button>
+                        </Link>
+                        <button
+                          className="p-1.5 rounded hover:bg-gray-100"
+                          title="Edit"
+                        >
+                          <Edit className="h-4 w-4 text-gray-500" />
+                        </button>
+                        {row.role === "Learner" && (
+                          <button
+                            className="p-1.5 rounded hover:bg-gray-100"
+                            title="Send Magic Link"
+                          >
+                            <Send className="h-4 w-4 text-gray-500" />
+                          </button>
+                        )}
+                        <button className="p-1.5 rounded hover:bg-gray-100">
+                          <MoreVertical className="h-4 w-4 text-gray-500" />
+                        </button>
+                      </div>
+                    ),
+                    className: "w-32",
+                  },
+                ]
+              : []),
           ]}
           data={learners}
         />
