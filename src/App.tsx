@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import { AuthContextProvider } from "./context/auth/AuthContextProvider";
+import PublicRouteGuard from "./components/RoutingComponents/PublicRouteGuard";
+import ProtectedRouteGuard from "./components/RoutingComponents/ProtectedRouteGuard";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Cohorts from "./pages/Cohorts";
@@ -30,16 +31,18 @@ import PublicVerification from "./pages/PublicVerification";
 
 function App() {
   return (
-    <AuthContextProvider>
-      <Routes>
-        {/* Public Routes */}
+    <Routes>
+      {/* Public Routes */}
+      <Route element={<PublicRouteGuard />}>
         <Route path="/login" element={<Login />} />
         <Route path="/learner" element={<LearnerPortal />} />
         <Route path="/certificate/:id" element={<CertificateViewer />} />
         <Route path="/verify" element={<PublicVerification />} />
         <Route path="/verify/:token" element={<PublicVerification />} />
+      </Route>
 
-        {/* Admin Routes */}
+      {/* Admin Routes */}
+      <Route element={<ProtectedRouteGuard />}>
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="cohorts" element={<Cohorts />} />
@@ -64,8 +67,8 @@ function App() {
         <Route path="support-requests" element={<SupportRequests />} />
         <Route path="reports" element={<Reports />} /> */}
         </Route>
-      </Routes>
-    </AuthContextProvider>
+      </Route>
+    </Routes>
   );
 }
 

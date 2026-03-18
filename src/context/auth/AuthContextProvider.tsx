@@ -28,6 +28,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const isValidRole = (role: string): role is Role => {

@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/auth/AuthContextProvider";
 import logo from "../images/sgs_logo_x.jpg";
 import {
   LayoutDashboard,
@@ -48,6 +49,8 @@ const navigation = [
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { user } = useAuth();
+
   return (
     <>
       {/* Mobile sidebar */}
@@ -111,7 +114,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </button>
               <div>
                 <p className="text-sm font-medium text-white">Admin User</p>
-                <p className="text-xs text-white">admin@sgs.edu</p>
+                <p className="text-xs text-white">{user?.emailAddress}</p>
               </div>
             </div>
           </div>
