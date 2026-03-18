@@ -5,6 +5,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Cohorts from "./pages/Cohorts";
 import CohortDetail from "./pages/CohortDetail";
+import CohortBatchDetail from "./pages/CohortBatchDetail";
 import Learners from "./pages/Learners";
 import LearnerProfile from "./pages/LearnerProfile";
 import BulkUpload from "./pages/BulkUpload";
@@ -47,6 +48,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="cohorts" element={<Cohorts />} />
           <Route path="cohorts/:id" element={<CohortDetail />} />
+          <Route path="cohorts/batch/:id" element={<CohortBatchDetail />} />
           <Route path="learners" element={<Learners />} />
           <Route path="learners/:id" element={<LearnerProfile />} />
           <Route path="bulk-upload" element={<BulkUpload />} />
