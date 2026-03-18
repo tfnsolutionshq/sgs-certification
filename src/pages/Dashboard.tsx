@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/auth/AuthContextProvider";
 import {
   Award,
   Users,
@@ -119,6 +120,8 @@ const issuanceTrends = [
 ];
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const maxIssuance = Math.max(...issuanceTrends.map((i) => i.count));
 
   return (
@@ -127,12 +130,14 @@ export default function Dashboard() {
         title="Dashboard"
         description="Overview of your certificate management system"
         action={
-          <Link to="#">
-            <Button>
-              <PlayCircle className="h-4 w-4 mr-2" />
-              New Generation Job
-            </Button>
-          </Link>
+          (user?.role === "super admin" || user?.role === "admin") && (
+            <Link to="#">
+              <Button>
+                <PlayCircle className="h-4 w-4 mr-2" />
+                New Generation Job
+              </Button>
+            </Link>
+          )
         }
       />
 
