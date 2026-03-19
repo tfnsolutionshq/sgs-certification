@@ -34,7 +34,7 @@ const navigation = [
   { name: "Learners", href: "/learners", icon: Users },
   { name: "Bulk Upload", href: "/bulk-upload", icon: Upload },
   { name: "Certificate Types", href: "/certificate-types", icon: FileText },
-  // { name: "Templates", href: "/templates", icon: FileCheck },
+  { name: "Templates", href: "/templates", icon: FileCheck },
   // { name: "Signatories", href: "/signatories", icon: PenTool },
   // { name: "Signature Sets", href: "/signature-sets", icon: Layers },
   // { name: "Certificates", href: "/certificates", icon: FileBadge },
