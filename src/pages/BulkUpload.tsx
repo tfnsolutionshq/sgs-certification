@@ -545,10 +545,6 @@ export default function BulkUpload() {
                 <span className="font-medium text-green-600">3</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Records Updated</span>
-                <span className="font-medium text-blue-600">0</span>
-              </div>
-              <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Records Failed</span>
                 <span className="font-medium text-red-600">2</span>
               </div>
@@ -598,7 +594,6 @@ export default function BulkUpload() {
                     <span className="text-green-600">
                       {row.created} created
                     </span>
-                    <span className="text-blue-600">{row.updated} updated</span>
                     <span className="text-red-600">{row.failed} failed</span>
                   </div>
                 ),
