@@ -33,7 +33,7 @@ const navigation = [
   { name: "Cohorts", href: "/cohorts", icon: GraduationCap },
   { name: "Learners", href: "/learners", icon: Users },
   { name: "Bulk Upload", href: "/bulk-upload", icon: Upload },
-  // { name: "Certificate Types", href: "/certificate-types", icon: FileText },
+  { name: "Certificate Types", href: "/certificate-types", icon: FileText },
   // { name: "Templates", href: "/templates", icon: FileCheck },
   // { name: "Signatories", href: "/signatories", icon: PenTool },
   // { name: "Signature Sets", href: "/signature-sets", icon: Layers },

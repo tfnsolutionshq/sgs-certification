@@ -52,21 +52,21 @@ function App() {
           <Route path="learners" element={<Learners />} />
           <Route path="learners/:id" element={<LearnerProfile />} />
           <Route path="bulk-upload" element={<BulkUpload />} />
-          {/* <Route path="certificate-types" element={<CertificateTypes />} />
-        <Route path="certificate-types/:id" element={<CertificateTypeDetail />} />
+          <Route path="certificate-types" element={<CertificateTypes />} />
+          {/* <Route path="certificate-types/:id" element={<CertificateTypeDetail />} />
         <Route path="templates" element={<Templates />} />
         <Route path="templates/:id" element={<TemplateEditor />} />
         <Route path="signatories" element={<Signatories />} />
         <Route path="signature-sets" element={<SignatureSets />} />
         <Route path="certificates" element={<CertificateRecords />} />
-        <Route path="certificates/:id" element={<CertificateDetail />} />
-        <Route path="generation-jobs" element={<GenerationJobs />} />
-        <Route path="verification-logs" element={<VerificationLogs />} />
-        <Route path="audit-logs" element={<AuditLogs />} />
-        <Route path="settings" element={<Settings />} /> */}
+        <Route path="certificates/:id" element={<CertificateDetail />} /> */}
+          <Route path="generation-jobs" element={<GenerationJobs />} />
+          {/* <Route path="verification-logs" element={<VerificationLogs />} /> */}
+          {/* <Route path="audit-logs" element={<AuditLogs />} /> */}
+          <Route path="settings" element={<Settings />} />
           <Route path="role-management" element={<RoleManagement />} />
-          {/* <Route path="security-settings" element={<SecuritySettings />} />
-        <Route path="support-requests" element={<SupportRequests />} />
+          {/* <Route path="security-settings" element={<SecuritySettings />} /> */}
+          {/* <Route path="support-requests" element={<SupportRequests />} />
         <Route path="reports" element={<Reports />} /> */}
         </Route>
       </Route>
