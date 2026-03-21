@@ -7,7 +7,6 @@ import {
   Users,
   Calendar,
   GraduationCap,
-  Play,
   CheckCircle,
   AlertCircle,
   X,
@@ -58,7 +57,7 @@ const cohorts = [
 
 export default function Cohorts() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newCohort, setNewCohort] = useState({
+  const [newBatch, setNewBatch] = useState({
     name: "",
     program: "",
     startDate: "",
@@ -211,20 +210,13 @@ export default function Cohorts() {
                     View Details
                   </Button>
                 </Link>
-                {(user?.role === "super admin" || user?.role === "admin") &&
-                  cohort.pending > 0 && (
-                    <Button size="sm">
-                      <Play className="h-3 w-3 mr-1" />
-                      Generate
-                    </Button>
-                  )}
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Add Cohort Modal */}
+      {/* Add Batch Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
@@ -234,7 +226,7 @@ export default function Cohorts() {
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-text-dark">
-                Create New Cohort
+                Add a New Batch
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
@@ -247,16 +239,16 @@ export default function Cohorts() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cohort Name
+                  Batch Name
                 </label>
                 <input
                   type="text"
-                  value={newCohort.name}
+                  value={newBatch.name}
                   onChange={(e) =>
-                    setNewCohort({ ...newCohort, name: e.target.value })
+                    setNewBatch({ ...newBatch, name: e.target.value })
                   }
                   className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  placeholder="e.g., Batch 2024-C"
+                  placeholder="e.g., 2026 Cohort - Batch A"
                 />
               </div>
 
@@ -265,9 +257,9 @@ export default function Cohorts() {
                   Program
                 </label>
                 <select
-                  value={newCohort.program}
+                  value={newBatch.program}
                   onChange={(e) =>
-                    setNewCohort({ ...newCohort, program: e.target.value })
+                    setNewBatch({ ...newBatch, program: e.target.value })
                   }
                   className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
@@ -291,9 +283,9 @@ export default function Cohorts() {
                   </label>
                   <input
                     type="date"
-                    value={newCohort.startDate}
+                    value={newBatch.startDate}
                     onChange={(e) =>
-                      setNewCohort({ ...newCohort, startDate: e.target.value })
+                      setNewBatch({ ...newBatch, startDate: e.target.value })
                     }
                     className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />
@@ -304,9 +296,9 @@ export default function Cohorts() {
                   </label>
                   <input
                     type="date"
-                    value={newCohort.endDate}
+                    value={newBatch.endDate}
                     onChange={(e) =>
-                      setNewCohort({ ...newCohort, endDate: e.target.value })
+                      setNewBatch({ ...newBatch, endDate: e.target.value })
                     }
                     className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />

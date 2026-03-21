@@ -143,7 +143,6 @@ export default function Cohorts() {
                   <h3 className="font-semibold text-text-dark">
                     {cohort.name}
                   </h3>
-                  <p className="text-sm text-gray-500">{cohort.program}</p>
                 </Link>
                 {(user?.role === "super admin" || user?.role === "admin") && (
                   <button className="p-1 rounded hover:bg-gray-100">
@@ -151,24 +150,6 @@ export default function Cohorts() {
                   </button>
                 )}
               </div>
-
-              {/* Progress Bar */}
-              {/* <div className="mb-4">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-gray-500">Certificate Progress</span>
-                  <span className="font-medium">
-                    {Math.round((cohort.generated / cohort.students) * 100)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div
-                    className="bg-primary h-1.5 rounded-full"
-                    style={{
-                      width: `${(cohort.generated / cohort.students) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div> */}
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
@@ -200,13 +181,6 @@ export default function Cohorts() {
                     View Details
                   </Button>
                 </Link>
-                {(user?.role === "super admin" || user?.role === "admin") &&
-                  cohort.pending > 0 && (
-                    <Button size="sm">
-                      <Play className="h-3 w-3 mr-1" />
-                      Generate
-                    </Button>
-                  )}
               </div>
             </CardContent>
           </Card>
@@ -245,61 +219,8 @@ export default function Cohorts() {
                     setNewCohort({ ...newCohort, name: e.target.value })
                   }
                   className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  placeholder="e.g., Batch 2024-C"
+                  placeholder="e.g., 2026 Cohort"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Program
-                </label>
-                <select
-                  value={newCohort.program}
-                  onChange={(e) =>
-                    setNewCohort({ ...newCohort, program: e.target.value })
-                  }
-                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  <option value="">Select a program</option>
-                  <option value="General Studies Diploma">
-                    General Studies Diploma
-                  </option>
-                  <option value="Advanced Certificate">
-                    Advanced Certificate
-                  </option>
-                  <option value="Professional Certificate">
-                    Professional Certificate
-                  </option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={newCohort.startDate}
-                    onChange={(e) =>
-                      setNewCohort({ ...newCohort, startDate: e.target.value })
-                    }
-                    className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={newCohort.endDate}
-                    onChange={(e) =>
-                      setNewCohort({ ...newCohort, endDate: e.target.value })
-                    }
-                    className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  />
-                </div>
               </div>
 
               <div className="pt-4 flex gap-3">

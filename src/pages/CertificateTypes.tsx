@@ -1,8 +1,9 @@
-import { Plus, MoreVertical, Award, FileText, Star } from "lucide-react";
+import { Plus, MoreVertical, Award, FileText, Star, X } from "lucide-react";
 import { useAuth } from "../context/auth/AuthContextProvider";
 import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
 import Card, { CardContent } from "../components/Card";
+import { useState } from "react";
 
 const certificateTypes = [
   {
@@ -58,6 +59,13 @@ const certificateTypes = [
 ];
 
 export default function CertificateTypes() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newCertificate, setNewCertificate] = useState({
+    program: "",
+    description: "",
+    template: "",
+    signatureSet: "",
+  });
   const { user } = useAuth();
 
   return (
@@ -67,7 +75,7 @@ export default function CertificateTypes() {
         description="Manage different types of certificates issued by the institution"
         action={
           (user?.role === "super admin" || user?.role === "admin") && (
-            <Button>
+            <Button onClick={() => setShowAddModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Certificate Type
             </Button>
@@ -127,7 +135,10 @@ export default function CertificateTypes() {
 
         {/* Add New Card */}
         {(user?.role === "super admin" || user?.role === "admin") && (
-          <Card className="border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer">
+          <Card
+            className="border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
+            onCardClick={() => setShowAddModal(true)}
+          >
             <CardContent className="flex flex-col items-center justify-center h-full min-h-[240px] text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-4">
                 <Plus className="h-6 w-6 text-gray-400" />
@@ -140,6 +151,131 @@ export default function CertificateTypes() {
           </Card>
         )}
       </div>
+
+      {/* Add Certificate Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setShowAddModal(false)}
+          />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-text-dark">
+                Add a Certificate Type
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1 rounded hover:bg-gray-100"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Program
+                </label>
+                <input
+                  type="text"
+                  value={newCertificate.program}
+                  onChange={(e) =>
+                    setNewCertificate({
+                      ...newCertificate,
+                      program: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="e.g., General Studies Diploma"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  value={newCertificate.program}
+                  onChange={(e) =>
+                    setNewCertificate({
+                      ...newCertificate,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="Enter brief description of program here..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Template
+                </label>
+                <select
+                  value={newCertificate.template}
+                  onChange={(e) =>
+                    setNewCertificate({
+                      ...newCertificate,
+                      template: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select a template</option>
+                  <option value="Standard Completion">
+                    Standard Completion
+                  </option>
+                  <option value="Achievement Gold">Achievement Gold</option>
+                  <option value="Workshop Standard">Workshop Standard</option>
+                  <option value="Professional Blue">Professional Blue</option>
+                  <option value="Honours Premium">Honours Premium</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Signature Set
+                </label>
+                <select
+                  value={newCertificate.signatureSet}
+                  onChange={(e) =>
+                    setNewCertificate({
+                      ...newCertificate,
+                      signatureSet: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select a signature set</option>
+                  <option value="Dean + Director SGS">
+                    Dean + Director SGS
+                  </option>
+                  <option value="Director Only">Director Only</option>
+                  <option value="VC + Dean">VC + Dean</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Create Certifcate Type
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

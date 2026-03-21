@@ -1,9 +1,17 @@
-import { useState } from "react";
-import { Plus, MoreVertical, Eye, Edit } from "lucide-react";
+import { useRef, useState } from "react";
+import {
+  Plus,
+  MoreVertical,
+  Eye,
+  Edit,
+  X,
+  FileSpreadsheet,
+  Upload,
+} from "lucide-react";
 import { useAuth } from "../context/auth/AuthContextProvider";
 import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
-import Card, { CardContent } from "../components/Card";
+import Card, { CardContent, CardHeader } from "../components/Card";
 
 type TemplateCategory =
   | "Completion"
@@ -89,14 +97,41 @@ const templates: {
 ];
 
 export default function Templates() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTemplate, setNewTemplate] = useState<{
+    uploadedFile: File | null;
+    name: string;
+    description: string;
+    category: string;
+  }>({
+    uploadedFile: null,
+    name: "",
+    description: "",
+    category: "",
+  });
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] =
     useState<FilterOption>("All Templates");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredTemplates =
     activeFilter === "All Templates"
       ? templates
       : templates.filter((t) => t.category === activeFilter);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      console.log(e.target.files[0].name);
+      setNewTemplate({ ...newTemplate, uploadedFile: e.target.files[0] });
+    }
+  };
+
+  const handleButtonClick = (e: React.FormEvent) => {
+    console.log(newTemplate.uploadedFile);
+    e.preventDefault();
+    fileInputRef.current?.click();
+  };
 
   return (
     <div>
@@ -105,7 +140,7 @@ export default function Templates() {
         description="Design and manage certificate templates"
         action={
           (user?.role === "super admin" || user?.role === "admin") && (
-            <Button>
+            <Button onClick={() => setShowAddModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Create Template
             </Button>
@@ -203,6 +238,163 @@ export default function Templates() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Add Template Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setShowAddModal(false)}
+          />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 h-[70%] overflow-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-text-dark">
+                Create a New Template
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1 rounded hover:bg-gray-100"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name of Template
+                </label>
+                <input
+                  type="text"
+                  value={newTemplate.name}
+                  onChange={(e) =>
+                    setNewTemplate({ ...newTemplate, name: e.target.value })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="e.g., Standard Completion"
+                />
+              </div>
+
+              <div>
+                <Card>
+                  <CardHeader>
+                    <p className="font-semibold text-text-dark">Upload File</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="border-2 border-dashed rounded-xl p-12 text-center transition-colors">
+                      {newTemplate.uploadedFile ? (
+                        <>
+                          <FileSpreadsheet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-sm text-gray-500 mb-4">
+                            {newTemplate.uploadedFile.name}
+                          </p>
+                          <input
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            id="file-upload"
+                            ref={fileInputRef}
+                          />
+                          <label htmlFor="file-upload">
+                            <Button
+                              onClick={(e) => handleButtonClick(e)}
+                              className="cursor-pointer"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Change File
+                            </Button>
+                          </label>
+                        </>
+                      ) : (
+                        <>
+                          <FileSpreadsheet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-sm text-gray-500 mb-4">
+                            Click to upload a template (JPG, PNG, JPEG)
+                          </p>
+                          <input
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            id="file-upload"
+                            ref={fileInputRef}
+                          />
+                          <label htmlFor="file-upload">
+                            <Button
+                              onClick={(e) => handleButtonClick(e)}
+                              className="cursor-pointer"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Choose File
+                            </Button>
+                          </label>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  value={newTemplate.description}
+                  onChange={(e) =>
+                    setNewTemplate({
+                      ...newTemplate,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="Enter a brief description here..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <select
+                  value={newTemplate.category}
+                  onChange={(e) =>
+                    setNewTemplate({
+                      ...newTemplate,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select a category</option>
+                  <option value="Completion">Completion</option>
+                  <option value="Achievement">Achievement</option>
+                  <option value="Participation">Participation</option>
+                  <option value="Professional">Professional</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Create Template
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
