@@ -11,15 +11,14 @@ import {
 } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
-import Card, { CardHeader, CardContent } from "../components/Card";
-import DataTable from "../components/DataTable";
+import Card, { CardContent } from "../components/Card";
+import { useAuth } from "../context/auth/AuthContextProvider";
 
 interface SignatureSet {
   id: number;
   name: string;
   description: string;
   signatories: string[];
-  certificateTypes: string[];
   status: "Active" | "Inactive";
   createdAt: string;
   lastUsed: string;
@@ -31,7 +30,6 @@ const signatureSets: SignatureSet[] = [
     name: "Dean + Director SGS",
     description: "Standard signature set for completion certificates",
     signatories: ["Dr. James Mitchell (Dean)", "Prof. Sarah Chen (Director)"],
-    certificateTypes: ["Completion", "Achievement"],
     status: "Active",
     createdAt: "2023-01-15",
     lastUsed: "2024-01-15",
@@ -41,7 +39,6 @@ const signatureSets: SignatureSet[] = [
     name: "Director Only",
     description: "Single signature for participation certificates",
     signatories: ["Prof. Sarah Chen (Director)"],
-    certificateTypes: ["Participation"],
     status: "Active",
     createdAt: "2023-03-20",
     lastUsed: "2024-01-10",
@@ -54,7 +51,6 @@ const signatureSets: SignatureSet[] = [
       "Prof. David Lee (Vice Chancellor)",
       "Dr. James Mitchell (Dean)",
     ],
-    certificateTypes: ["Honours", "Professional"],
     status: "Active",
     createdAt: "2023-06-01",
     lastUsed: "2024-01-08",
@@ -67,7 +63,6 @@ const signatureSets: SignatureSet[] = [
       "Dr. Robert Wilson (Former Dean)",
       "Prof. Sarah Chen (Director)",
     ],
-    certificateTypes: [],
     status: "Inactive",
     createdAt: "2022-01-01",
     lastUsed: "2023-12-31",
@@ -87,11 +82,22 @@ const availableSignatories = [
 
 export default function SignatureSets() {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingSet, setEditingSet] = useState<SignatureSet | null>(null);
+
   const [newSet, setNewSet] = useState({
     name: "",
     description: "",
     signatories: [] as number[],
   });
+
+  const [editSet, setEditSet] = useState({
+    name: "",
+    description: "",
+    signatories: [] as number[],
+  });
+
+  const { user } = useAuth();
 
   const toggleSignatory = (id: number) => {
     setNewSet((prev) => ({
@@ -102,16 +108,46 @@ export default function SignatureSets() {
     }));
   };
 
+  const toggleEditSignatory = (id: number) => {
+    setEditSet((prev) => ({
+      ...prev,
+      signatories: prev.signatories.includes(id)
+        ? prev.signatories.filter((s) => s !== id)
+        : [...prev.signatories, id],
+    }));
+  };
+
+  const handleEditClick = (set: SignatureSet) => {
+    setEditingSet(set);
+    setEditSet({
+      name: set.name,
+      description: set.description,
+      // Match available signatories to the set's signatories string list by name
+      signatories: availableSignatories
+        .filter((sig) => set.signatories.some((s) => s.includes(sig.name)))
+        .map((sig) => sig.id),
+    });
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingSet(null);
+    setEditSet({ name: "", description: "", signatories: [] });
+  };
+
   return (
     <div>
       <PageHeader
         title="Signature Sets"
         description="Create and manage signature combinations for certificates"
         action={
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Signature Set
-          </Button>
+          (user?.role === "super admin" || user?.role === "admin") && (
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Signature Set
+            </Button>
+          )
         }
       />
 
@@ -200,28 +236,13 @@ export default function SignatureSets() {
                   </div>
                 </div>
 
-                {set.certificateTypes.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-2">
-                      Used In
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {set.certificateTypes.map((type, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600"
-                        >
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                   <span>Last used: {set.lastUsed}</span>
                   <div className="flex gap-1">
-                    <button className="p-1.5 rounded hover:bg-gray-100">
+                    <button
+                      className="p-1.5 rounded hover:bg-gray-100"
+                      onClick={() => handleEditClick(set)}
+                    >
                       <Edit className="h-4 w-4 text-gray-500" />
                     </button>
                     {set.status === "Inactive" && (
@@ -330,6 +351,103 @@ export default function SignatureSets() {
                   onClick={() => setShowAddModal(false)}
                 >
                   Create Set
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Signature Set Modal */}
+      {showEditModal && editingSet && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={handleCloseEditModal}
+          />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-text-dark">
+                Edit Signature Set
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="p-1 rounded hover:bg-gray-100"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Set Name
+                </label>
+                <input
+                  type="text"
+                  value={editSet.name}
+                  onChange={(e) =>
+                    setEditSet({ ...editSet, name: e.target.value })
+                  }
+                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="e.g., Dean + Director"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={editSet.description}
+                  onChange={(e) =>
+                    setEditSet({ ...editSet, description: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                  placeholder="Describe when this set should be used..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Signatories
+                </label>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {availableSignatories.map((sig) => (
+                    <label
+                      key={sig.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        editSet.signatories.includes(sig.id)
+                          ? "border-primary bg-primary/5"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={editSet.signatories.includes(sig.id)}
+                        onChange={() => toggleEditSignatory(sig.id)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <div>
+                        <p className="font-medium text-text-dark">{sig.name}</p>
+                        <p className="text-xs text-gray-500">{sig.title}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={handleCloseEditModal}
+                >
+                  Cancel
+                </Button>
+                <Button className="flex-1" onClick={handleCloseEditModal}>
+                  Save Changes
                 </Button>
               </div>
             </form>
