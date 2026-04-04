@@ -29,6 +29,7 @@ import Login from "./pages/Login";
 import LearnerPortal from "./pages/LearnerPortal";
 import CertificateViewer from "./pages/CertificateViewer";
 import PublicVerification from "./pages/PublicVerification";
+import AuditLogDetails from "./pages/AuditLogDetails";
 
 function App() {
   return (
@@ -61,11 +62,12 @@ function App() {
           {/* <Route path="certificates" element={<CertificateRecords />} />
         <Route path="certificates/:id" element={<CertificateDetail />} />
           <Route path="generation-jobs" element={<GenerationJobs />} />
-          <Route path="verification-logs" element={<VerificationLogs />} />
+          <Route path="verification-logs" element={<VerificationLogs />} /> */}
           <Route path="audit-logs" element={<AuditLogs />} />
-          <Route path="settings" element={<Settings />} /> */}
+          <Route path="audit-logs/:id" element={<AuditLogDetails />} />
+          {/* <Route path="settings" element={<Settings />} /> */}
           <Route path="role-management" element={<RoleManagement />} />
-          {/* <Route path="security-settings" element={<SecuritySettings />} /> */}
+          <Route path="security-settings" element={<SecuritySettings />} />
           {/* <Route path="support-requests" element={<SupportRequests />} />
         <Route path="reports" element={<Reports />} /> */}
         </Route>

@@ -40,11 +40,11 @@ const navigation = [
   // { name: "Certificates", href: "/certificates", icon: FileBadge },
   // { name: "Generation Jobs", href: "/generation-jobs", icon: PlayCircle },
   // { name: "Verification Logs", href: "/verification-logs", icon: Search },
-  // { name: "Audit Logs", href: "/audit-logs", icon: ClipboardList },
+  { name: "Audit Logs", href: "/audit-logs", icon: ClipboardList },
   // { name: "Support Requests", href: "/support-requests", icon: HelpCircle },
   // { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Role Management", href: "/role-management", icon: UserCog },
-  // { name: "Security Settings", href: "/security-settings", icon: Shield },
+  { name: "Security Settings", href: "/security-settings", icon: Shield },
   // { name: "Settings", href: "/settings", icon: Settings },
 ];
 
