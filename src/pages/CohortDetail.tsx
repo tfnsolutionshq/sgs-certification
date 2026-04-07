@@ -65,6 +65,11 @@ export default function Cohorts() {
   });
   const { user } = useAuth();
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("New Batch Data:", newBatch);
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -236,13 +241,14 @@ export default function Cohorts() {
               </button>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Batch Name
                 </label>
                 <input
                   type="text"
+                  required
                   value={newBatch.name}
                   onChange={(e) =>
                     setNewBatch({ ...newBatch, name: e.target.value })
@@ -258,6 +264,7 @@ export default function Cohorts() {
                 </label>
                 <select
                   value={newBatch.program}
+                  required
                   onChange={(e) =>
                     setNewBatch({ ...newBatch, program: e.target.value })
                   }
@@ -283,6 +290,7 @@ export default function Cohorts() {
                   </label>
                   <input
                     type="date"
+                    required
                     value={newBatch.startDate}
                     onChange={(e) =>
                       setNewBatch({ ...newBatch, startDate: e.target.value })
@@ -296,6 +304,7 @@ export default function Cohorts() {
                   </label>
                   <input
                     type="date"
+                    required
                     value={newBatch.endDate}
                     onChange={(e) =>
                       setNewBatch({ ...newBatch, endDate: e.target.value })
@@ -313,10 +322,7 @@ export default function Cohorts() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => setShowAddModal(false)}
-                >
+                <Button className="flex-1" type="submit">
                   Create Cohort
                 </Button>
               </div>

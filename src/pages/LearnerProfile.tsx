@@ -20,6 +20,7 @@ import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
 import Card, { CardHeader, CardContent } from "../components/Card";
 import DataTable from "../components/DataTable";
+import { useAuth } from "../context/auth/AuthContextProvider";
 
 interface Certificate {
   id: number;
@@ -101,8 +102,10 @@ export default function LearnerProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(learnerData);
   const [showResendModal, setShowResendModal] = useState(false);
+  const { user } = useAuth();
 
   const handleSave = () => {
+    console.log("Here is the edited data: ", editData);
     // In real app, save to backend with audit trail
     setIsEditing(false);
   };
@@ -124,13 +127,15 @@ export default function LearnerProfile() {
         description={`${learnerData.program} - ${learnerData.cohort}`}
         action={
           <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => setShowResendModal(true)}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              Send Magic Link
-            </Button>
+            {(user?.role === "super admin" || user?.role === "admin") && (
+              <Button
+                variant="secondary"
+                onClick={() => setShowResendModal(true)}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Send Magic Link
+              </Button>
+            )}
             <Button variant="secondary">
               <Download className="h-4 w-4 mr-2" />
               Export
@@ -148,29 +153,30 @@ export default function LearnerProfile() {
                 <h3 className="text-lg font-semibold text-text-dark">
                   Profile Details
                 </h3>
-                {!isEditing ? (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="p-1.5 rounded hover:bg-gray-100"
-                  >
-                    <Edit className="h-4 w-4 text-gray-500" />
-                  </button>
-                ) : (
-                  <div className="flex gap-1">
+                {(user?.role === "super admin" || user?.role === "admin") &&
+                  (!isEditing ? (
                     <button
-                      onClick={handleSave}
+                      onClick={() => setIsEditing(true)}
                       className="p-1.5 rounded hover:bg-gray-100"
                     >
-                      <Save className="h-4 w-4 text-green-500" />
+                      <Edit className="h-4 w-4 text-gray-500" />
                     </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="p-1.5 rounded hover:bg-gray-100"
-                    >
-                      <X className="h-4 w-4 text-gray-500" />
-                    </button>
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={handleSave}
+                        className="p-1.5 rounded hover:bg-gray-100"
+                      >
+                        <Save className="h-4 w-4 text-green-500" />
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="p-1.5 rounded hover:bg-gray-100"
+                      >
+                        <X className="h-4 w-4 text-gray-500" />
+                      </button>
+                    </div>
+                  ))}
               </div>
             </CardHeader>
             <CardContent>
@@ -313,10 +319,12 @@ export default function LearnerProfile() {
                 <h3 className="text-lg font-semibold text-text-dark">
                   Certificates
                 </h3>
-                <Button size="sm">
-                  <Award className="h-4 w-4 mr-2" />
-                  Issue Certificate
-                </Button>
+                {(user?.role === "super admin" || user?.role === "admin") && (
+                  <Button size="sm">
+                    <Award className="h-4 w-4 mr-2" />
+                    Issue Certificate
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <DataTable

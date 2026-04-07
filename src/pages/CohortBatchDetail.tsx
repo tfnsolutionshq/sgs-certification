@@ -9,7 +9,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Play,
+  Send,
   MoreVertical,
   Download,
   RefreshCw,
@@ -162,8 +162,8 @@ export default function CohortDetail() {
                 Export
               </Button>
               <Button onClick={() => setShowGenerateModal(true)}>
-                <Play className="h-4 w-4 mr-2" />
-                Generate Certificates
+                <Send className="h-4 w-4 mr-2" />
+                Issue Certificates
               </Button>
             </div>
           )
@@ -411,7 +411,7 @@ export default function CohortDetail() {
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-text-dark">
-                Generate Certificates
+                Issue Certificates
               </h3>
               {!generating && (
                 <button
@@ -428,10 +428,10 @@ export default function CohortDetail() {
                 <div className="text-center">
                   <Award className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
                   <p className="font-medium text-text-dark">
-                    Generating Certificates...
+                    Issuing Certificates...
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
-                    Please wait while we generate certificates
+                    Please wait while we issue the certificates
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -450,7 +450,7 @@ export default function CohortDetail() {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-gray-600">
-                  You are about to generate certificates for{" "}
+                  You are about to issue certificates for{" "}
                   <strong>
                     {cohortData.pending +
                       (cohortData.students -
@@ -479,8 +479,8 @@ export default function CohortDetail() {
                 <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-yellow-700">
-                    This will generate PDF certificates and send email
-                    notifications to all recipients.
+                    This will issue PDF certificates via email notifications to
+                    all recipients.
                   </p>
                 </div>
 
@@ -493,8 +493,8 @@ export default function CohortDetail() {
                     Cancel
                   </Button>
                   <Button className="flex-1" onClick={handleGenerate}>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Generation
+                    <Send className="h-4 w-4 mr-2" />
+                    Start Issuance
                   </Button>
                 </div>
               </div>

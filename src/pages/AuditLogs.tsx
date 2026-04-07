@@ -18,7 +18,7 @@ import DataTable from "../components/DataTable";
 const auditLogs = [
   {
     id: 1,
-    action: "Certificate Issued",
+    event: "Certificate Issued",
     type: "Action",
     description: "Certificate CERT-2024-00847 issued to John Doe",
     performedBy: "Admin User",
@@ -27,7 +27,7 @@ const auditLogs = [
   },
   {
     id: 2,
-    action: "User Created",
+    event: "User Created",
     type: "Action",
     description: "New learner account created for jane.smith@email.com",
     performedBy: "Admin User",
@@ -36,7 +36,7 @@ const auditLogs = [
   },
   {
     id: 3,
-    action: "Template Modified",
+    event: "Template Modified",
     type: "Change",
     description: 'Template "Standard Completion" updated',
     performedBy: "Mike Johnson",
@@ -45,7 +45,7 @@ const auditLogs = [
   },
   {
     id: 4,
-    action: "Settings Changed",
+    event: "Settings Changed",
     type: "Change",
     description: "Email notification settings updated",
     performedBy: "Admin User",
@@ -54,7 +54,7 @@ const auditLogs = [
   },
   {
     id: 5,
-    action: "Cohort Created",
+    event: "Cohort Created",
     type: "Action",
     description: 'New cohort "Batch 2024-B" created with 89 students',
     performedBy: "Admin User",
@@ -63,7 +63,7 @@ const auditLogs = [
   },
   {
     id: 6,
-    action: "Signatory Added",
+    event: "Signatory Added",
     type: "Action",
     description: "Dr. Emily Watson added as signatory",
     performedBy: "Admin User",
@@ -72,7 +72,7 @@ const auditLogs = [
   },
   {
     id: 7,
-    action: "Certificate Revoked",
+    event: "Certificate Revoked",
     type: "Action",
     description: "Certificate CERT-2023-00521 revoked - Duplicate issuance",
     performedBy: "Mike Johnson",
@@ -81,7 +81,7 @@ const auditLogs = [
   },
   {
     id: 8,
-    action: "Bulk Import",
+    event: "Bulk Import",
     type: "Action",
     description: "156 learners imported to Batch 2024-A",
     performedBy: "Admin User",
@@ -194,7 +194,7 @@ export default function AuditLogs() {
         <DataTable
           columns={[
             {
-              header: "Action",
+              header: "Event",
               accessor: (row) => (
                 <div className="flex items-center gap-3">
                   <div
@@ -207,7 +207,7 @@ export default function AuditLogs() {
                       to={`/audit-logs/${row.id}`}
                       className="font-medium text-text-dark hover:text-[#21618C]"
                     >
-                      {row.action}
+                      {row.event}
                     </Link>
                     <p className="text-xs text-gray-500 max-w-md truncate">
                       {row.description}
@@ -217,7 +217,7 @@ export default function AuditLogs() {
               ),
             },
             {
-              header: "Action Type",
+              header: "Event Type",
               accessor: (row) => (
                 <span
                   className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getActionTypeColor(row.type)}`}

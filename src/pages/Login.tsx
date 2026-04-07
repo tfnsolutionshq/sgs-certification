@@ -58,6 +58,7 @@ export default function Login() {
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {
+    console.log("here is reset email: ", resetEmail);
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
@@ -240,13 +241,6 @@ export default function Login() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-
-          {/* Demo credentials notice */}
-          <div className="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-100">
-            <p className="text-xs text-gray-500 text-center">
-              Demo: Enter any email and password to login
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">

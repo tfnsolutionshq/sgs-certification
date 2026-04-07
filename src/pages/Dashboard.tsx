@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/auth/AuthContextProvider";
 import {
   Award,
   Users,
@@ -120,8 +119,6 @@ const issuanceTrends = [
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
-
   const maxIssuance = Math.max(...issuanceTrends.map((i) => i.count));
 
   return (
@@ -129,16 +126,6 @@ export default function Dashboard() {
       <PageHeader
         title="Dashboard"
         description="Overview of your certificate management system"
-        action={
-          (user?.role === "super admin" || user?.role === "admin") && (
-            <Link to="#">
-              <Button>
-                <PlayCircle className="h-4 w-4 mr-2" />
-                New Generation Job
-              </Button>
-            </Link>
-          )
-        }
       />
 
       {/* Stats Grid */}
@@ -180,7 +167,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-text-dark">
-                    Active Generation Jobs
+                    Active Issuance Jobs
                   </h3>
                   <p className="text-sm text-gray-500">
                     {activeJobs.filter((j) => j.status === "processing").length}{" "}

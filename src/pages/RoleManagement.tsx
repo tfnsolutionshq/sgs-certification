@@ -19,7 +19,7 @@ interface Admin {
   id: number;
   name: string;
   email: string;
-  role: "Super Admin" | "Admin" | "Read-only Admin";
+  role: "super admin" | "admin" | "read-only admin";
   status: "Active" | "Inactive" | "Locked";
   lastLogin: string;
   createdAt: string;
@@ -30,7 +30,7 @@ const admins: Admin[] = [
     id: 1,
     name: "Dr. James Mitchell",
     email: "j.mitchell@sgs.edu",
-    role: "Super Admin",
+    role: "super admin",
     status: "Active",
     lastLogin: "2024-01-15 10:30 AM",
     createdAt: "2023-01-01",
@@ -39,7 +39,7 @@ const admins: Admin[] = [
     id: 2,
     name: "Sarah Chen",
     email: "s.chen@sgs.edu",
-    role: "Admin",
+    role: "admin",
     status: "Active",
     lastLogin: "2024-01-15 09:15 AM",
     createdAt: "2023-03-15",
@@ -48,7 +48,7 @@ const admins: Admin[] = [
     id: 3,
     name: "Mike Johnson",
     email: "m.johnson@sgs.edu",
-    role: "Admin",
+    role: "admin",
     status: "Active",
     lastLogin: "2024-01-14 04:45 PM",
     createdAt: "2023-06-20",
@@ -57,7 +57,7 @@ const admins: Admin[] = [
     id: 4,
     name: "Emily Watson",
     email: "e.watson@sgs.edu",
-    role: "Read-only Admin",
+    role: "read-only admin",
     status: "Active",
     lastLogin: "2024-01-14 02:30 PM",
     createdAt: "2023-09-10",
@@ -66,7 +66,7 @@ const admins: Admin[] = [
     id: 5,
     name: "David Lee",
     email: "d.lee@sgs.edu",
-    role: "Admin",
+    role: "admin",
     status: "Locked",
     lastLogin: "2024-01-10 11:00 AM",
     createdAt: "2023-04-05",
@@ -75,7 +75,7 @@ const admins: Admin[] = [
     id: 6,
     name: "Amanda White",
     email: "a.white@sgs.edu",
-    role: "Read-only Admin",
+    role: "read-only admin",
     status: "Inactive",
     lastLogin: "2023-12-20 03:00 PM",
     createdAt: "2023-07-15",
@@ -130,12 +130,17 @@ export default function RoleManagement() {
   const [newAdmin, setNewAdmin] = useState({
     name: "",
     email: "",
-    role: "Admin" as const,
+    role: "super admin",
   });
 
   const { user } = useAuth();
 
   const canManage = user?.role === "super admin" || user?.role === "admin";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("In the submit function!", newAdmin);
+  };
 
   return (
     <div>
@@ -268,14 +273,14 @@ export default function RoleManagement() {
               accessor: (row) => (
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    row.role === "Super Admin"
+                    row.role === "super admin"
                       ? "bg-purple-100 text-purple-700"
-                      : row.role === "Admin"
+                      : row.role === "admin"
                         ? "bg-blue-100 text-blue-700"
                         : "bg-gray-100 text-gray-700"
                   }`}
                 >
-                  {row.role}
+                  {row.role.charAt(0).toUpperCase() + row.role.slice(1)}
                 </span>
               ),
             },
@@ -309,7 +314,7 @@ export default function RoleManagement() {
                         >
                           <Edit className="h-4 w-4 text-gray-500" />
                         </button>
-                        {row.role !== "Super Admin" && (
+                        {row.role !== "super admin" && (
                           <button
                             className="p-1.5 rounded hover:bg-gray-100"
                             title="Delete"
@@ -351,7 +356,7 @@ export default function RoleManagement() {
               </button>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name
@@ -359,6 +364,7 @@ export default function RoleManagement() {
                 <input
                   type="text"
                   value={newAdmin.name}
+                  required
                   onChange={(e) =>
                     setNewAdmin({ ...newAdmin, name: e.target.value })
                   }
@@ -374,6 +380,7 @@ export default function RoleManagement() {
                 <input
                   type="email"
                   value={newAdmin.email}
+                  required
                   onChange={(e) =>
                     setNewAdmin({ ...newAdmin, email: e.target.value })
                   }
@@ -388,16 +395,18 @@ export default function RoleManagement() {
                 </label>
                 <select
                   value={newAdmin.role}
-                  onChange={(e) =>
-                    setNewAdmin({
-                      ...newAdmin,
-                      role: e.target.value as "Admin",
-                    })
-                  }
+                  onChange={(e) => {
+                    const role = e.target.value as
+                      | "super admin"
+                      | "admin"
+                      | "read-only admin";
+                    setNewAdmin({ ...newAdmin, role });
+                  }}
                   className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
-                  <option value="Admin">Admin</option>
-                  <option value="Read-only Admin">Read-only Admin</option>
+                  <option value="super admin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="read-only admin">Read-only Admin</option>
                 </select>
               </div>
 
@@ -409,10 +418,7 @@ export default function RoleManagement() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => setShowAddModal(false)}
-                >
+                <Button className="flex-1" type="submit">
                   Add Admin
                 </Button>
               </div>

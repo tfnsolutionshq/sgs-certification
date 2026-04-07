@@ -3,10 +3,8 @@ import {
   Upload,
   Download,
   FileSpreadsheet,
-  AlertCircle,
   CheckCircle,
   FileText,
-  AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "../context/auth/AuthContextProvider";
 import PageHeader from "../components/PageHeader";
@@ -25,6 +23,12 @@ interface UploadHistory {
   updated: number;
   failed: number;
   status: "Completed" | "Processing" | "Failed";
+}
+
+interface FieldConfig {
+  name: string;
+  description: string;
+  required: boolean;
 }
 
 const uploadHistory: UploadHistory[] = [
@@ -78,7 +82,7 @@ const uploadHistory: UploadHistory[] = [
   },
 ];
 
-const requiredFields = [
+const defaultFields: FieldConfig[] = [
   {
     name: "email",
     description: "Learner email address (unique identifier)",
@@ -96,7 +100,7 @@ const requiredFields = [
     required: false,
   },
   { name: "program", description: "Program name or code", required: true },
-  { name: "cohort", description: "Cohort identifier", required: false },
+  { name: "batch", description: "Batch name", required: false },
   {
     name: "issue_date",
     description: "Certificate issue date (YYYY-MM-DD)",
@@ -105,16 +109,17 @@ const requiredFields = [
 ];
 
 export default function BulkUpload() {
-  const [step, setStep] = useState<
-    "upload" | "configure" | "preview" | "result"
-  >("upload");
+  const [step, setStep] = useState<"upload" | "configureAndImport" | "result">(
+    "upload",
+  );
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [duplicateHandling, setDuplicateHandling] = useState<
     "merge" | "create" | "reject"
   >("merge");
   const [selectedCohort, setSelectedCohort] = useState("");
-  const [processing, setProcessing] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [fields, setFields] = useState<FieldConfig[]>(defaultFields);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,49 +129,11 @@ export default function BulkUpload() {
 
   const { user } = useAuth();
 
-  // Simulated preview data
-  const previewData = [
-    {
-      row: 1,
-      email: "john.doe@email.com",
-      first_name: "John",
-      last_name: "Doe",
-      program: "General Studies",
-      status: "Valid",
-    },
-    {
-      row: 2,
-      email: "jane.smith@email.com",
-      first_name: "Jane",
-      last_name: "Smith",
-      program: "General Studies",
-      status: "Valid",
-    },
-    {
-      row: 3,
-      email: "invalid-email",
-      first_name: "Mike",
-      last_name: "Johnson",
-      program: "General Studies",
-      status: "Invalid Email",
-    },
-    {
-      row: 4,
-      email: "sarah.w@email.com",
-      first_name: "",
-      last_name: "Wilson",
-      program: "General Studies",
-      status: "Missing First Name",
-    },
-    {
-      row: 5,
-      email: "tom.brown@email.com",
-      first_name: "Tom",
-      last_name: "Brown",
-      program: "General Studies",
-      status: "Valid",
-    },
-  ];
+  const handleFieldRequiredChange = (fieldName: string, required: boolean) => {
+    setFields((prev) =>
+      prev.map((f) => (f.name === fieldName ? { ...f, required } : f)),
+    );
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -185,21 +152,29 @@ export default function BulkUpload() {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setUploadedFile(e.dataTransfer.files[0]);
-      setStep("configure");
+      setStep("configureAndImport");
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadedFile(e.target.files[0]);
-      setStep("configure");
+      setStep("configureAndImport");
     }
   };
 
-  const handleProcess = () => {
-    setProcessing(true);
+  const handleImport = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(
+      "This is the data: ",
+      uploadedFile,
+      fields,
+      selectedCohort,
+      duplicateHandling,
+    );
+    setImporting(true);
     setTimeout(() => {
-      setProcessing(false);
+      setImporting(false);
       setStep("result");
     }, 2000);
   };
@@ -215,74 +190,63 @@ export default function BulkUpload() {
       <PageHeader
         title="Bulk Upload"
         description="Import learners from CSV or XLSX files"
-        action={
-          (user?.role === "super admin" || user?.role === "admin") && (
-            <Button variant="secondary" onClick={() => {}}>
-              <Download className="h-4 w-4 mr-2" />
-              Download Template
-            </Button>
-          )
-        }
       />
 
       {/* Progress Steps */}
       {(user?.role === "super admin" || user?.role === "admin") && (
         <div className="mb-8">
           <div className="flex items-center justify-center">
-            {["Upload", "Configure", "Preview", "Result"].map(
-              (label, index) => {
-                const stepNames = [
-                  "upload",
-                  "configure",
-                  "preview",
-                  "result",
-                ] as const;
-                const isActive = stepNames.indexOf(step) >= index;
-                const isCurrent = step === stepNames[index];
+            {["Upload", "Configure & Import", "Result"].map((label, index) => {
+              const stepNames = [
+                "upload",
+                "configureAndImport",
+                "result",
+              ] as const;
+              const isActive = stepNames.indexOf(step) >= index;
+              const isCurrent = step === stepNames[index];
 
-                return (
-                  <div key={label} className="flex items-center">
-                    <div
-                      className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                        isActive
-                          ? "bg-primary text-white"
-                          : "bg-gray-200 text-gray-500"
-                      } ${isCurrent ? "ring-2 ring-primary ring-offset-2" : ""}`}
-                    >
-                      {index + 1}
-                    </div>
-                    <span
-                      className={`ml-2 text-sm ${isActive ? "text-text-dark font-medium" : "text-gray-500"}`}
-                    >
-                      {label}
-                    </span>
-                    {index < 3 && (
-                      <div
-                        className={`w-16 h-0.5 mx-4 ${isActive && stepNames.indexOf(step) > index ? "bg-primary" : "bg-gray-200"}`}
-                      />
-                    )}
+              return (
+                <div key={label} className="flex items-center">
+                  <div
+                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                      isActive
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-500"
+                    } ${isCurrent ? "ring-2 ring-primary ring-offset-2" : ""}`}
+                  >
+                    {index + 1}
                   </div>
-                );
-              },
-            )}
+                  <span
+                    className={`ml-2 text-sm ${isActive ? "text-text-dark font-medium" : "text-gray-500"}`}
+                  >
+                    {label}
+                  </span>
+                  {index < 2 && (
+                    <div
+                      className={`w-16 h-0.5 mx-4 ${isActive && stepNames.indexOf(step) > index ? "bg-primary" : "bg-gray-200"}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Step 1: Upload */}
       {step === "upload" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           {(user?.role === "super admin" || user?.role === "admin") && (
-            <div className="lg:col-span-2">
-              <Card>
+            <div className="lg:col-span-2 flex flex-col">
+              <Card className="flex-1 flex flex-col">
                 <CardHeader>
                   <h3 className="text-lg font-semibold text-text-dark">
                     Upload File
                   </h3>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 flex flex-col">
                   <div
-                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
+                    className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
                       dragActive
                         ? "border-primary bg-primary/5"
                         : "border-gray-200 hover:border-gray-300"
@@ -331,31 +295,80 @@ export default function BulkUpload() {
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold text-text-dark">
-                  Required Fields
+                  Field Configuration
                 </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Set whether each field is required or optional
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {requiredFields.map((field) => (
-                  <div key={field.name} className="flex items-start gap-2">
-                    {field.required ? (
-                      <span className="inline-flex px-1.5 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700">
-                        REQ
-                      </span>
-                    ) : (
-                      <span className="inline-flex px-1.5 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
-                        OPT
-                      </span>
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-text-dark">
+              <CardContent className="space-y-1">
+                {/* Column headers */}
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                  <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                    Field
+                  </span>
+                  <div className="flex items-center gap-4 pr-1">
+                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wide w-14 text-center">
+                      Required
+                    </span>
+                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wide w-14 text-center">
+                      Optional
+                    </span>
+                  </div>
+                </div>
+
+                {fields.map((field) => (
+                  <div
+                    key={field.name}
+                    className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0"
+                  >
+                    {/* Field info */}
+                    <div className="min-w-0 flex-1 pr-4">
+                      <p className="text-sm font-medium text-text-dark truncate">
                         {field.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400 truncate">
                         {field.description}
                       </p>
                     </div>
+
+                    {/* Radio group */}
+                    <div className="flex items-center gap-4 shrink-0">
+                      <label className="flex items-center justify-center w-14 cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`field-${field.name}`}
+                          checked={field.required}
+                          onChange={() =>
+                            handleFieldRequiredChange(field.name, true)
+                          }
+                          className="h-4 w-4 accent-primary cursor-pointer"
+                        />
+                      </label>
+                      <label className="flex items-center justify-center w-14 cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`field-${field.name}`}
+                          checked={!field.required}
+                          onChange={() =>
+                            handleFieldRequiredChange(field.name, false)
+                          }
+                          className="h-4 w-4 accent-primary cursor-pointer"
+                        />
+                      </label>
+                    </div>
                   </div>
                 ))}
+
+                {/* Summary footer */}
+                <div className="pt-3 flex items-center gap-3">
+                  <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700">
+                    {fields.filter((f) => f.required).length} required
+                  </span>
+                  <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
+                    {fields.filter((f) => !f.required).length} optional
+                  </span>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -363,7 +376,7 @@ export default function BulkUpload() {
       )}
 
       {/* Step 2: Configure */}
-      {step === "configure" && (
+      {step === "configureAndImport" && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -394,136 +407,71 @@ export default function BulkUpload() {
               </div>
             </div>
 
-            {/* Configuration Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Cohort
-                </label>
-                <select
-                  value={selectedCohort}
-                  onChange={(e) => setSelectedCohort(e.target.value)}
-                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  <option value="">Select a cohort</option>
-                  <option value="batch-2024-a">Batch 2024-A</option>
-                  <option value="batch-2024-b">Batch 2024-B</option>
-                  <option value="batch-2023-c">Batch 2023-C</option>
-                  <option value="new">Create New Cohort</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Duplicate Handling
-                </label>
-                <select
-                  value={duplicateHandling}
-                  onChange={(e) =>
-                    setDuplicateHandling(
-                      e.target.value as "merge" | "create" | "reject",
-                    )
-                  }
-                  className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  <option value="merge">Merge with existing records</option>
-                  <option value="create">Create separate entries</option>
-                  <option value="reject">Reject duplicates</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {duplicateHandling === "merge" &&
-                    "Update existing records if email matches"}
-                  {duplicateHandling === "create" &&
-                    "Create new records even if email exists"}
-                  {duplicateHandling === "reject" &&
-                    "Skip records with existing emails"}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-4 flex justify-end gap-3">
-              <Button variant="secondary" onClick={resetUpload}>
-                Cancel
-              </Button>
-              <Button onClick={() => setStep("preview")}>Preview Data</Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 3: Preview */}
-      {step === "preview" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-text-dark">
-                  Preview & Validate
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Review data before importing
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-gray-600">3 valid</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <span className="text-sm text-gray-600">2 errors</span>
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-          <DataTable
-            columns={[
-              { header: "Row", accessor: "row", className: "w-16" },
-              { header: "Email", accessor: "email" },
-              { header: "First Name", accessor: "first_name" },
-              { header: "Last Name", accessor: "last_name" },
-              { header: "Program", accessor: "program" },
-              {
-                header: "Status",
-                accessor: (row) => (
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      row.status === "Valid"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
+            <form onSubmit={handleImport}>
+              {/* Configuration Options */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Target Cohort
+                  </label>
+                  <select
+                    value={selectedCohort}
+                    required
+                    onChange={(e) => setSelectedCohort(e.target.value)}
+                    className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   >
-                    {row.status}
-                  </span>
-                ),
-              },
-            ]}
-            data={previewData}
-          />
-          <div className="p-4 border-t border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-lg">
-                <AlertTriangle className="h-4 w-4" />
-                <span>
-                  2 records have validation errors and will be skipped
-                </span>
+                    <option value="">Select a cohort</option>
+                    <option value="batch-2024-a">Batch 2024-A</option>
+                    <option value="batch-2024-b">Batch 2024-B</option>
+                    <option value="batch-2023-c">Batch 2023-C</option>
+                    <option value="new">Create New Cohort</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duplicate Handling
+                  </label>
+                  <select
+                    value={duplicateHandling}
+                    required
+                    onChange={(e) =>
+                      setDuplicateHandling(
+                        e.target.value as "merge" | "create" | "reject",
+                      )
+                    }
+                    className="w-full h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    <option value="merge">Merge with existing records</option>
+                    <option value="create">Create separate entries</option>
+                    <option value="reject">Reject duplicates</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {duplicateHandling === "merge" &&
+                      "Update existing records if email matches"}
+                    {duplicateHandling === "create" &&
+                      "Create new records even if email exists"}
+                    {duplicateHandling === "reject" &&
+                      "Skip records with existing emails"}
+                  </p>
+                </div>
               </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="secondary"
-                  onClick={() => setStep("configure")}
-                >
-                  Back
+
+              <div className="pt-4 flex justify-end gap-3">
+                <Button variant="secondary" onClick={resetUpload}>
+                  Cancel
                 </Button>
                 <Button
-                  onClick={handleProcess}
-                  variant={processing ? "loading" : "primary"}
+                  variant={importing ? "loading" : "primary"}
+                  type="submit"
                 >
-                  {processing ? "Processing..." : "Import 3 Records"}
+                  {importing
+                    ? "Importing Records..."
+                    : "Import Learner Records"}
                 </Button>
               </div>
-            </div>
-          </div>
+            </form>
+          </CardContent>
         </Card>
       )}
 

@@ -11,7 +11,6 @@ import {
   CheckCircle,
   AlertTriangle,
   Info,
-  Monitor,
   Hash,
   Tag,
   Layers,
@@ -451,32 +450,6 @@ export default function AuditLogDetail() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Technical details card */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-sm font-semibold text-text-dark flex items-center gap-2">
-                <Monitor className="h-4 w-4 text-gray-400" />
-                Technical Details
-              </h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-gray-500 mb-0.5">IP Address</p>
-                  <p className="text-sm font-medium text-text-dark font-mono">
-                    {log.ipAddress}
-                  </p>
-                </div>
-                <div className="border-t border-gray-100 pt-3">
-                  <p className="text-xs text-gray-500 mb-0.5">User Agent</p>
-                  <p className="text-sm font-medium text-text-dark">
-                    {log.userAgent}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* ── Right column: changes + notes ───────────────────────────────── */}
@@ -583,112 +556,6 @@ export default function AuditLogDetail() {
               </CardContent>
             </Card>
           )}
-
-          {/* Notes card */}
-          {log.notes && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Info className="h-4 w-4 text-gray-400" />
-                  <h3 className="text-lg font-semibold text-text-dark">
-                    Notes
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-lg bg-blue-50 border border-blue-100 p-4">
-                  <p className="text-sm text-blue-800 leading-relaxed">
-                    {log.notes}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Full event timeline */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold text-text-dark">
-                Event Timeline
-              </h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Step 1: Request received */}
-                <div className="flex items-start gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
-                      <Clock className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="w-px h-6 bg-gray-200 my-1" />
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <p className="text-sm font-medium text-text-dark">
-                      Request received
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Action initiated by {log.performedBy}
-                    </p>
-                    <span className="text-xs text-gray-400">
-                      {log.timestamp}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Step 2: Authentication verified */}
-                <div className="flex items-start gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 flex-shrink-0">
-                      <Shield className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="w-px h-6 bg-gray-200 my-1" />
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <p className="text-sm font-medium text-text-dark">
-                      Authentication verified
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Session {log.sessionId} validated from {log.ipAddress}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3: Action executed */}
-                <div className="flex items-start gap-3">
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full flex-shrink-0 ${getCategoryColor(log.category)}`}
-                    >
-                      {getCategoryIcon(log.category)}
-                    </div>
-                    <div className="w-px h-6 bg-gray-200 my-1" />
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <p className="text-sm font-medium text-text-dark">
-                      {log.action} executed
-                    </p>
-                    <p className="text-xs text-gray-500">{log.description}</p>
-                  </div>
-                </div>
-
-                {/* Step 4: Log recorded */}
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 flex-shrink-0">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-text-dark">
-                      Audit log recorded
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Entry #{String(log.id).padStart(6, "0")} saved
-                      successfully
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

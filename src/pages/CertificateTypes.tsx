@@ -68,6 +68,11 @@ export default function CertificateTypes() {
   });
   const { user } = useAuth();
 
+  const certificateTypeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("the new certificate type: ", newCertificate);
+  };
+
   return (
     <div>
       <PageHeader
@@ -172,7 +177,7 @@ export default function CertificateTypes() {
               </button>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={certificateTypeSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Program
@@ -197,7 +202,7 @@ export default function CertificateTypes() {
                 </label>
                 <input
                   type="text"
-                  value={newCertificate.program}
+                  value={newCertificate.description}
                   onChange={(e) =>
                     setNewCertificate({
                       ...newCertificate,
@@ -265,10 +270,7 @@ export default function CertificateTypes() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => setShowAddModal(false)}
-                >
+                <Button className="flex-1" type="submit">
                   Create Certifcate Type
                 </Button>
               </div>

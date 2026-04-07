@@ -243,11 +243,17 @@ export default function SignatureSets() {
                       className="p-1.5 rounded hover:bg-gray-100"
                       onClick={() => handleEditClick(set)}
                     >
-                      <Edit className="h-4 w-4 text-gray-500" />
+                      {(user?.role === "super admin" ||
+                        user?.role === "admin") && (
+                        <Edit className="h-4 w-4 text-gray-500" />
+                      )}
                     </button>
                     {set.status === "Inactive" && (
                       <button className="p-1.5 rounded hover:bg-gray-100">
-                        <Trash2 className="h-4 w-4 text-gray-500" />
+                        {(user?.role === "super admin" ||
+                          user?.role === "admin") && (
+                          <Trash2 className="h-4 w-4 text-gray-500" />
+                        )}
                       </button>
                     )}
                   </div>

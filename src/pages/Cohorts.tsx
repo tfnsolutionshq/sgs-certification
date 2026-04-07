@@ -1,17 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthContextProvider";
-import {
-  Plus,
-  MoreVertical,
-  Users,
-  Calendar,
-  GraduationCap,
-  Play,
-  CheckCircle,
-  AlertCircle,
-  X,
-} from "lucide-react";
+import { Plus, MoreVertical, Calendar, GraduationCap, X } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import Button from "../components/Button";
 import Card, { CardContent } from "../components/Card";
@@ -83,11 +73,13 @@ export default function Cohorts() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCohort, setNewCohort] = useState({
     name: "",
-    program: "",
-    startDate: "",
-    endDate: "",
   });
   const { user } = useAuth();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("cohort to be created:", newCohort);
+  };
 
   return (
     <div>
@@ -207,13 +199,14 @@ export default function Cohorts() {
               </button>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Cohort Name
                 </label>
                 <input
                   type="text"
+                  required
                   value={newCohort.name}
                   onChange={(e) =>
                     setNewCohort({ ...newCohort, name: e.target.value })
@@ -231,10 +224,7 @@ export default function Cohorts() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => setShowAddModal(false)}
-                >
+                <Button className="flex-1" type="submit">
                   Create Cohort
                 </Button>
               </div>
