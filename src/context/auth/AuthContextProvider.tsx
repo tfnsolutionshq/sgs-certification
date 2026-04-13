@@ -6,7 +6,8 @@ import {
   type ReactNode,
 } from "react";
 import { AuthContextType } from "./types";
-import usersData from "../../data/users.json";
+// import usersData from "../../data/users.json";
+import api from "../../utils/api";
 
 type AuthContextProviderProps = {
   children: ReactNode;
@@ -14,72 +15,116 @@ type AuthContextProviderProps = {
 
 type Role = "super admin" | "admin" | "read-only admin";
 
+type ApiResponse<T> = {
+  status: boolean;
+  message: string;
+  data: T;
+};
+
+type LoginData = {
+  token: string;
+  user: {
+    email: string;
+    name: string;
+  };
+};
+
 const AuthContext = createContext<AuthContextType | null>(null);
+
+const normalizeRole = (name: string): Role => {
+  switch (name) {
+    case "Super Admin":
+      return "super admin";
+    case "Admin":
+      return "admin";
+    case "Read-only Admin":
+      return "read-only admin";
+    default:
+      throw new Error("Unknown role from backend");
+  }
+};
 
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<{
-    emailAddress: string;
+    email: string;
     role: Role;
   } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("sgs_token");
+    const storedUser = localStorage.getItem("sgs_user");
+
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+    } else {
+      setUser({
+        email: "",
+        role: "read-only admin", // or a safe default fallback
+      });
     }
+
     setLoading(false);
   }, []);
 
   const isValidRole = (role: string): role is Role => {
     return (
-      role === "super admin" || role === "admin" || role === "read-only admin"
+      role === "Super Admin" || role === "Admin" || role === "Read-only Admin"
     );
   };
 
-  const login = async (emailAddress: string, password: string) => {
-    const matchedUser = await new Promise<
-      { emailAddress: string; role: string; password: string } | undefined
-    >((resolve) => {
-      setTimeout(() => {
-        const user = usersData.find(
-          (user) => user.emailAddress === emailAddress,
-        );
-        resolve(user);
-      }, 5000);
-    });
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post<ApiResponse<LoginData>>("/login", {
+        email,
+        password,
+      });
 
-    if (matchedUser) {
-      if (matchedUser.password !== password) {
-        return { success: false, message: "Wrong Password!" };
-      }
+      const { user, token } = response.data;
 
-      if (!isValidRole(matchedUser.role)) {
+      if (!isValidRole(user.name)) {
         throw new Error("Invalid Role!");
       }
 
-      setUser({
-        emailAddress: matchedUser.emailAddress,
-        role: matchedUser.role,
-      });
+      // 🔁 Mapping layer (VERY IMPORTANT)
+      const appUser = {
+        email: user.email,
+        role: normalizeRole(user.name),
+      };
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          emailAddress: matchedUser.emailAddress,
-          role: matchedUser.role,
-        }),
-      );
+      setUser(appUser);
+
+      localStorage.setItem("sgs_user", JSON.stringify(appUser));
+      localStorage.setItem("sgs_token", token);
 
       return { success: true };
-    } else {
-      return { success: false, message: "User not found!" };
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("401")) {
+          return { success: false, message: "Invalid Credentials!" };
+        }
+        if (error.message.includes("429")) {
+          return {
+            success: false,
+            message: "Too many attempts! Try again later.",
+          };
+        }
+      }
+
+      return { success: false, message: "An unexpected error occurred." };
     }
   };
 
   const logout = async () => {
     setUser(null);
-    localStorage.removeItem("user");
+    localStorage.removeItem("sgs_user");
+    localStorage.removeItem("sgs_token");
   };
 
   return (

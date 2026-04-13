@@ -8,19 +8,15 @@ import {
   FileText,
   FileCheck,
   PenTool,
-  Search,
   ClipboardList,
-  Settings,
   X,
   User,
   Upload,
   Layers,
   FileBadge,
-  PlayCircle,
   Shield,
   UserCog,
-  HelpCircle,
-  BarChart3,
+  LogOut,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -49,7 +45,7 @@ const navigation = [
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <>
@@ -108,14 +104,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
 
           <div className="border-t border-white/10 p-4">
-            <div className="rounded-lg bg-white/10 p-3 flex items-center">
-              <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-text-light mr-3">
-                <User className="h-5 w-5" />
-              </button>
-              <div>
-                <p className="text-sm font-medium text-white">Admin User</p>
-                <p className="text-xs text-white">{user?.emailAddress}</p>
+            <div className="rounded-lg bg-white/10 p-3">
+              <div className="flex items-center">
+                <button className="flex h-9 w-10 items-center justify-center rounded-full bg-primary text-text-light mr-3">
+                  <User className="h-5 w-5" />
+                </button>
+                <div className="overflow-hidden">
+                  <p className="text-sm font-medium text-white">Admin User</p>
+                  <p className="text-xs text-white truncate">{user?.email}</p>
+                </div>
               </div>
+              <button
+                className="text-white flex items-center justify-center bg-sidebar p-3 w-full rounded-lg mt-3 text-sm"
+                onClick={() => logout()}
+              >
+                <LogOut className="h-5 w-5 mr-3" />
+                <span>Log Out</span>
+              </button>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 export type AuthContextType = {
   user: {
-    emailAddress: string;
+    email: string;
     role: string;
   } | null;
   login: (
