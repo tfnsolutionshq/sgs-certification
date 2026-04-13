@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   ArrowLeft,
   Mail,
@@ -98,11 +98,12 @@ const activityLog = [
 ];
 
 export default function LearnerProfile() {
-  const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(learnerData);
   const [showResendModal, setShowResendModal] = useState(false);
   const { user } = useAuth();
+
+  const canManage = user?.role === "super admin" || user?.role === "admin";
 
   const handleSave = () => {
     console.log("Here is the edited data: ", editData);
@@ -363,34 +364,38 @@ export default function LearnerProfile() {
                     </span>
                   ),
                 },
-                {
-                  header: "Actions",
-                  accessor: (row) => (
-                    <div className="flex items-center gap-1">
-                      <Link to={`/certificates/${row.id}`}>
-                        <button
-                          className="p-1.5 rounded hover:bg-gray-100"
-                          title="View"
-                        >
-                          <FileText className="h-4 w-4 text-gray-500" />
-                        </button>
-                      </Link>
-                      <button
-                        className="p-1.5 rounded hover:bg-gray-100"
-                        title="Download"
-                      >
-                        <Download className="h-4 w-4 text-gray-500" />
-                      </button>
-                      <button
-                        className="p-1.5 rounded hover:bg-gray-100"
-                        title="Regenerate"
-                      >
-                        <RefreshCw className="h-4 w-4 text-gray-500" />
-                      </button>
-                    </div>
-                  ),
-                  className: "w-28",
-                },
+                ...(canManage
+                  ? [
+                      {
+                        header: "Actions",
+                        accessor: (row: Certificate) => (
+                          <div className="flex items-center gap-1">
+                            <Link to={`/certificates/${row.id}`}>
+                              <button
+                                className="p-1.5 rounded hover:bg-gray-100"
+                                title="View"
+                              >
+                                <FileText className="h-4 w-4 text-gray-500" />
+                              </button>
+                            </Link>
+                            <button
+                              className="p-1.5 rounded hover:bg-gray-100"
+                              title="Download"
+                            >
+                              <Download className="h-4 w-4 text-gray-500" />
+                            </button>
+                            <button
+                              className="p-1.5 rounded hover:bg-gray-100"
+                              title="Regenerate"
+                            >
+                              <RefreshCw className="h-4 w-4 text-gray-500" />
+                            </button>
+                          </div>
+                        ),
+                        className: "w-28",
+                      },
+                    ]
+                  : []),
               ]}
               data={learnerCertificates}
             />

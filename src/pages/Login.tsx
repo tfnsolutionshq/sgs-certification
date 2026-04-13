@@ -17,13 +17,13 @@ export default function Login() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const data = login(email, password);
+      const data = await login(email, password);
 
       if (data.success) {
         navigate("/");
@@ -35,26 +35,6 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-
-    // Simulate login - in real app this would validate against backend
-    // setTimeout(() => {
-    //   if (email && password) {
-    //     // Store user session (dummy)
-    //     localStorage.setItem(
-    //       "sgs_user",
-    //       JSON.stringify({
-    //         email,
-    //         name: "Admin User",
-    //         role: "Super Admin",
-    //         permissions: ["all"],
-    //       }),
-    //     );
-    //     navigate("/");
-    //   } else {
-    //     setError("Please enter your email and password");
-    //   }
-    //   setLoading(false);
-    // }, 1000);
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {

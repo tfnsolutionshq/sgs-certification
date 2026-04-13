@@ -6,7 +6,7 @@ export type AuthContextType = {
   login: (
     emailAddress: string,
     password: string,
-  ) => { success: boolean; message?: string };
+  ) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;

@@ -37,10 +37,17 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     );
   };
 
-  const login = (emailAddress: string, password: string) => {
-    const matchedUser = usersData.find(
-      (user) => user.emailAddress === emailAddress,
-    );
+  const login = async (emailAddress: string, password: string) => {
+    const matchedUser = await new Promise<
+      { emailAddress: string; role: string; password: string } | undefined
+    >((resolve) => {
+      setTimeout(() => {
+        const user = usersData.find(
+          (user) => user.emailAddress === emailAddress,
+        );
+        resolve(user);
+      }, 5000);
+    });
 
     if (matchedUser) {
       if (matchedUser.password !== password) {

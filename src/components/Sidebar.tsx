@@ -37,7 +37,7 @@ const navigation = [
   { name: "Templates", href: "/templates", icon: FileCheck },
   { name: "Signatories", href: "/signatories", icon: PenTool },
   { name: "Signature Sets", href: "/signature-sets", icon: Layers },
-  // { name: "Certificates", href: "/certificates", icon: FileBadge },
+  { name: "Certificates", href: "/certificates", icon: FileBadge },
   // { name: "Generation Jobs", href: "/generation-jobs", icon: PlayCircle },
   // { name: "Verification Logs", href: "/verification-logs", icon: Search },
   { name: "Audit Logs", href: "/audit-logs", icon: ClipboardList },

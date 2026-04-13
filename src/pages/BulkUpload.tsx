@@ -185,6 +185,8 @@ export default function BulkUpload() {
     setSelectedCohort("");
   };
 
+  const isReadOnly = user?.role === "read-only admin";
+
   return (
     <div>
       <PageHeader
@@ -193,7 +195,7 @@ export default function BulkUpload() {
       />
 
       {/* Progress Steps */}
-      {(user?.role === "super admin" || user?.role === "admin") && (
+      {!isReadOnly && (
         <div className="mb-8">
           <div className="flex items-center justify-center">
             {["Upload", "Configure & Import", "Result"].map((label, index) => {
@@ -236,7 +238,7 @@ export default function BulkUpload() {
       {/* Step 1: Upload */}
       {step === "upload" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          {(user?.role === "super admin" || user?.role === "admin") && (
+          {!isReadOnly && (
             <div className="lg:col-span-2 flex flex-col">
               <Card className="flex-1 flex flex-col">
                 <CardHeader>
@@ -285,13 +287,7 @@ export default function BulkUpload() {
               </Card>
             </div>
           )}
-          <div
-            className={
-              user?.role === "super admin" || user?.role === "admin"
-                ? "lg:col-span-1"
-                : "lg:col-span-3"
-            }
-          >
+          <div className={!isReadOnly ? "lg:col-span-1" : "lg:col-span-3"}>
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold text-text-dark">
@@ -334,26 +330,28 @@ export default function BulkUpload() {
 
                     {/* Radio group */}
                     <div className="flex items-center gap-4 shrink-0">
-                      <label className="flex items-center justify-center w-14 cursor-pointer">
+                      <label className="flex items-center justify-center w-14">
                         <input
                           type="radio"
                           name={`field-${field.name}`}
+                          disabled={isReadOnly}
                           checked={field.required}
                           onChange={() =>
                             handleFieldRequiredChange(field.name, true)
                           }
-                          className="h-4 w-4 accent-primary cursor-pointer"
+                          className="h-4 w-4 accent-primary cursor-pointer disabled:cursor-not-allowed"
                         />
                       </label>
-                      <label className="flex items-center justify-center w-14 cursor-pointer">
+                      <label className="flex items-center justify-center w-14">
                         <input
                           type="radio"
                           name={`field-${field.name}`}
+                          disabled={isReadOnly}
                           checked={!field.required}
                           onChange={() =>
                             handleFieldRequiredChange(field.name, false)
                           }
-                          className="h-4 w-4 accent-primary cursor-pointer"
+                          className="h-4 w-4 accent-primary cursor-pointer disabled:cursor-not-allowed"
                         />
                       </label>
                     </div>
@@ -475,7 +473,7 @@ export default function BulkUpload() {
         </Card>
       )}
 
-      {/* Step 4: Result */}
+      {/* Step 3: Result */}
       {step === "result" && (
         <Card>
           <CardContent className="py-12 text-center">
