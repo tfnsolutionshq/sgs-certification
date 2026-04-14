@@ -52,25 +52,59 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     const token = localStorage.getItem("sgs_token");
-    const storedUser = localStorage.getItem("sgs_user");
 
     if (!token) {
+      localStorage.removeItem("sgs_user"); // clean up stale user data
       setUser(null);
       setLoading(false);
       return;
     }
 
+    // Token exists — use cached user if available, but still verify in background
+    const storedUser = localStorage.getItem("sgs_user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-    } else {
-      setUser({
-        email: "",
-        role: "read-only admin", // or a safe default fallback
-      });
+      setLoading(false); // show UI immediately with cached user
     }
 
-    setLoading(false);
+    // Always verify token with the server
+    const fetchUser = async () => {
+      try {
+        const res: ApiResponse<{ email: string; name: string }> = await api.get(
+          "/me",
+          {
+            signal: controller.signal,
+          },
+        );
+
+        const appUser = {
+          email: res.data.email,
+          role: normalizeRole(res.data.name),
+        };
+
+        setUser(appUser);
+        localStorage.setItem("sgs_user", JSON.stringify(appUser));
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          return;
+        }
+
+        // Only log out the user if the token is actually rejected
+        if (error instanceof Error && error.message.includes("401")) {
+          localStorage.removeItem("sgs_token");
+          localStorage.removeItem("sgs_user");
+          setUser(null);
+        }
+      } finally {
+        if (!storedUser) setLoading(false); // only update loading if not already resolved
+      }
+    };
+
+    fetchUser();
+
+    return () => controller.abort();
   }, []);
 
   const isValidRole = (role: string): role is Role => {
@@ -92,7 +126,6 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         throw new Error("Invalid Role!");
       }
 
-      // 🔁 Mapping layer (VERY IMPORTANT)
       const appUser = {
         email: user.email,
         role: normalizeRole(user.name),
@@ -117,7 +150,10 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         }
       }
 
-      return { success: false, message: "An unexpected error occurred." };
+      return {
+        success: false,
+        message: "An unexpected error occurred. Try again later.",
+      };
     }
   };
 

@@ -103,13 +103,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </ul>
           </nav>
 
-          <div className="border-t border-white/10 p-4">
+          <div className="border-t border-white/10 p-3">
             <div className="rounded-lg bg-white/10 p-3">
               <div className="flex items-center">
-                <button className="flex h-9 w-10 items-center justify-center rounded-full bg-primary text-text-light mr-3">
+                <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-text-light">
                   <User className="h-5 w-5" />
                 </button>
-                <div className="overflow-hidden">
+                <div className="overflow-hidden ml-3">
                   <p className="text-sm font-medium text-white">Admin User</p>
                   <p className="text-xs text-white truncate">{user?.email}</p>
                 </div>

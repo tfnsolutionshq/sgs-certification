@@ -1,10 +1,16 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
-import TopNavbar from '../components/TopNavbar'
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import TopNavbar from "../components/TopNavbar";
+import { useAuth } from "../context/auth/AuthContextProvider";
 
 export default function DashboardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <div className="bg-white h-screen"></div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,11 +28,11 @@ export default function DashboardLayout() {
       {/* Main content area */}
       <div className="lg:pl-64">
         <TopNavbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="p-4 md:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }

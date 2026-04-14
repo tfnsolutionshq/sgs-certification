@@ -6,13 +6,14 @@ interface RequestOptions {
   method?: HttpMethod;
   body?: unknown;
   headers?: Record<string, string>;
+  signal?: AbortSignal;
 }
 
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, headers: extraHeaders = {} } = options;
+  const { method = "GET", body, headers: extraHeaders = {}, signal } = options;
 
   const headers: Record<string, string> = {
     Accept: "application/json",
@@ -20,7 +21,7 @@ async function request<T>(
     ...extraHeaders,
   };
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("sgs_token");
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -29,6 +30,7 @@ async function request<T>(
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
+    signal,
   });
 
   if (!response.ok) {

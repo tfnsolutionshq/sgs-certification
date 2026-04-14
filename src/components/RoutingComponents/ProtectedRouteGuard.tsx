@@ -1,15 +1,18 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthContextProvider";
-import { isAuthenticated } from "../../utils/auth";
 
 const ProtectedRouteGuard = () => {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
+
+  // if (!token) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
   if (loading) {
     return <div className="bg-white h-screen"></div>;
   }
 
-  if (!isAuthenticated()) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
