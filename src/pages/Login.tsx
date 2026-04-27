@@ -1,50 +1,51 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Award, Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react'
-import Button from '../components/Button'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Award, Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
+import { useAuth } from "../context/auth/AuthContextProvider";
+import logo from "../images/sgs_logo_x.jpg";
+import Button from "../components/Button";
 
 export default function Login() {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
-  const [resetEmail, setResetEmail] = useState('')
-  const [resetSent, setResetSent] = useState(false)
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // Simulate login - in real app this would validate against backend
-    setTimeout(() => {
-      if (email && password) {
-        // Store user session (dummy)
-        localStorage.setItem('sgs_user', JSON.stringify({
-          email,
-          name: 'Admin User',
-          role: 'Super Admin',
-          permissions: ['all']
-        }))
-        navigate('/')
-      } else {
-        setError('Please enter your email and password')
+    try {
+      const data = await login(email, password);
+
+      if (data.success) {
+        navigate("/");
+      } else if (data.message) {
+        setError(data.message);
       }
-      setLoading(false)
-    }, 1000)
-  }
+    } catch (err) {
+      setError("Error logging in!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleForgotPassword = (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    console.log("here is reset email: ", resetEmail);
+    e.preventDefault();
+    setLoading(true);
     setTimeout(() => {
-      setResetSent(true)
-      setLoading(false)
-    }, 1500)
-  }
+      setResetSent(true);
+      setLoading(false);
+    }, 1500);
+  };
 
   if (showForgotPassword) {
     return (
@@ -57,11 +58,13 @@ export default function Login() {
                   <Award className="h-8 w-8 text-white" />
                 </div>
               </div>
-              <h1 className="text-2xl font-bold text-text-dark">Reset Password</h1>
+              <h1 className="text-2xl font-bold text-text-dark">
+                Reset Password
+              </h1>
               <p className="text-gray-500 mt-2">
-                {resetSent 
-                  ? 'Check your email for reset instructions'
-                  : 'Enter your email to receive reset instructions'}
+                {resetSent
+                  ? "Check your email for reset instructions"
+                  : "Enter your email to receive reset instructions"}
               </p>
             </div>
 
@@ -72,12 +75,12 @@ export default function Login() {
                     Password reset link sent to <strong>{resetEmail}</strong>
                   </p>
                 </div>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => {
-                    setShowForgotPassword(false)
-                    setResetSent(false)
-                    setResetEmail('')
+                    setShowForgotPassword(false);
+                    setResetSent(false);
+                    setResetEmail("");
                   }}
                 >
                   Back to Login
@@ -102,8 +105,12 @@ export default function Login() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full h-12" variant={loading ? 'loading' : 'primary'}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  variant={loading ? "loading" : "primary"}
+                >
+                  {loading ? "Sending..." : "Send Reset Link"}
                 </Button>
 
                 <button
@@ -118,7 +125,7 @@ export default function Login() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -127,12 +134,12 @@ export default function Login() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* Logo & Title */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-                <Award className="h-8 w-8 text-white" />
-              </div>
+            <div className="w-24 h-24 mx-auto">
+              <img src={logo} alt="School of General Studies Logo" />
             </div>
-            <h1 className="text-2xl font-bold text-text-dark">SGS Certificate Portal</h1>
+            <h1 className="text-2xl font-bold text-text-dark">
+              SGS Certificate Portal
+            </h1>
             <p className="text-gray-500 mt-2">Sign in to manage certificates</p>
           </div>
 
@@ -169,7 +176,7 @@ export default function Login() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -180,14 +187,21 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
               <button
@@ -199,17 +213,14 @@ export default function Login() {
               </button>
             </div>
 
-            <Button type="submit" className="w-full h-12" variant={loading ? 'loading' : 'primary'}>
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button
+              type="submit"
+              className="w-full h-12"
+              variant={loading ? "loading" : "primary"}
+            >
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-
-          {/* Demo credentials notice */}
-          <div className="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-100">
-            <p className="text-xs text-gray-500 text-center">
-              Demo: Enter any email and password to login
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
@@ -217,5 +228,5 @@ export default function Login() {
         </p>
       </div>
     </div>
-  )
+  );
 }
